@@ -1,5 +1,5 @@
 Fitter report for VGA
-Mon Sep  9 12:34:11 2024
+Mon Sep  9 13:05:44 2024
 Quartus Prime Version 23.1std.1 Build 993 05/14/2024 SC Lite Edition
 
 
@@ -68,7 +68,7 @@ https://fpgasoftware.intel.com/eula.
 +-------------------------------------------------------------------------------------+
 ; Fitter Summary                                                                      ;
 +------------------------------------+------------------------------------------------+
-; Fitter Status                      ; Successful - Mon Sep  9 12:34:11 2024          ;
+; Fitter Status                      ; Successful - Mon Sep  9 13:05:44 2024          ;
 ; Quartus Prime Version              ; 23.1std.1 Build 993 05/14/2024 SC Lite Edition ;
 ; Revision Name                      ; VGA                                            ;
 ; Top-level Entity Name              ; VGA                                            ;
@@ -160,8 +160,8 @@ https://fpgasoftware.intel.com/eula.
 ;                            ;             ;
 ; Usage by Processor         ; % Time Used ;
 ;     Processor 1            ; 100.0%      ;
-;     Processor 2            ;   0.5%      ;
-;     Processors 3-4         ;   0.5%      ;
+;     Processor 2            ;   0.6%      ;
+;     Processors 3-4         ;   0.6%      ;
 +----------------------------+-------------+
 
 
@@ -937,9 +937,9 @@ Warning (169177): 3 pins must meet Intel FPGA requirements for 3.3-, 3.0-, and 2
     Info (169178): Pin clock uses I/O standard 3.3-V LVTTL at 23 File: /home/nymeria/Documents/GitHub/FPGA_Snake/VGA.v Line: 8
 Info (144001): Generated suppressed messages file /home/nymeria/Documents/GitHub/FPGA_Snake/VGA.fit.smsg
 Info: Quartus Prime Fitter was successful. 0 errors, 5 warnings
-    Info: Peak virtual memory: 923 megabytes
-    Info: Processing ended: Mon Sep  9 12:34:12 2024
-    Info: Elapsed time: 00:00:03
+    Info: Peak virtual memory: 927 megabytes
+    Info: Processing ended: Mon Sep  9 13:05:44 2024
+    Info: Elapsed time: 00:00:02
     Info: Total CPU time (on all processors): 00:00:03
 
 

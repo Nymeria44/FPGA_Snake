@@ -1,0 +1,8 @@
+*.qws
+db
+*.bak
+simulation
+output_files
+*.rpt
+incremental_db
+.qsys_edit

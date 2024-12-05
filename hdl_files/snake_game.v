@@ -25,6 +25,23 @@ module snake_game(
     wire [7:0] ps2_byte;               // 1byte hex key value
     wire slow_clk;                     // general clock
     wire game_clk;                     // game clock
+    wire [1:0] game_switch;            // Switch to control display mode
+    wire [9:0] hcount;
+    wire [9:0] vcount;
+    wire [2:0] data;
+    reg vga_clk;
+
+    // Generate VGA clock
+    initial begin
+        vga_clk = 0;
+    end
+
+    always @(posedge clk)
+    begin
+        vga_clk <= ~vga_clk;
+    end
+
+    assign game_switch = 2'b00;         // Always show horizontal data
 
 // -----------------------------------------------------------------------------
 // Clock signals for the game
@@ -33,33 +50,27 @@ module snake_game(
         .clk_in(clk),                       // INPUT 50Mhz FPGA clock
         .reset(rst_n),                      // INPUT reset button   
         .ratio(32'd10_000),                 // INPUT dividing ratio
-          .clk_out(slow_clk)                  // OUTPUT Frequency
+        .clk_out(slow_clk)                  // OUTPUT Frequency
     ); // 5KHz processing clock
 
     clock_divider very_slow_clock_divider(
         .clk_in(clk),                       // INPUT 50Mhz FPGA clock
         .reset(rst_n),                      // INPUT reset button
         .ratio(32'd10_000_000),             // INPUT dividing ratio
-          .clk_out(game_clk)                  // OUTPUT Frequency
+        .clk_out(game_clk)                  // OUTPUT Frequency
     ); // 5Hz game clock
-	 
-//    clock_divider VGA_clk(
-//        .clk_in(clk),                       // INPUT 50Mhz FPGA clock
-//        .reset(rst_n),                      // INPUT reset button
-//        .ratio(32'd5),                      // INPUT dividing ratio for 40MHz
-//        .clk_out(clk_40MHz)                 // OUTPUT 40 MHz clock
-//    ); // 40 MHz clock
 
 // -----------------------------------------------------------------------------
 // Player input
 // -----------------------------------------------------------------------------
     //PS2 keyboard input
-    ps2scan	ps2scan(.clk(clk),  		        // INPUT 50Mhz FPGA clock
-                    .rst_n(rst_n),				// INPUT reset button
-                    .ps2k_clk(ps2_clk),         // INPUT PS2 clk pin 10-16.7Khz
-                    .ps2k_data(ps2_data),       // INPUT PS2 data pin     
-                      .ps2_byte(ps2_byte),        // OUTPUT 1byte hex key value
-                      .ps2_state(ps2_state)       // OUTPUT keypress #unused
+    ps2scan	ps2scan(
+        .clk(clk),  		        // INPUT 50Mhz FPGA clock
+        .rst_n(rst_n),				// INPUT reset button
+        .ps2k_clk(ps2_clk),         // INPUT PS2 clk pin 10-16.7Khz
+        .ps2k_data(ps2_data),       // INPUT PS2 data pin     
+        .ps2_byte(ps2_byte),        // OUTPUT 1byte hex key value
+        .ps2_state(ps2_state)       // OUTPUT keypress #unused
     );
 
 // -----------------------------------------------------------------------------
@@ -70,9 +81,9 @@ module snake_game(
         .clk(game_clk),      // INPUT 5Hz game clock
         .rst_n(rst_n),            // INPUT reset button
         .ps2ascii(ps2_byte),      // INPUT raw keyboard input
-          .x_list(x_list),          // OUTPUT 189bit x coordinates
-          .y_list(y_list),          // OUTPUT 189bit y coordinates
-          .length(length)           // OUTPUT length of snake
+        .x_list(x_list),          // OUTPUT 189bit x coordinates
+        .y_list(y_list),          // OUTPUT 189bit y coordinates
+        .length(length)           // OUTPUT length of snake
     );
 
     // Slice 189bit data to 3bit coordinates, output 64bits for led matrix
@@ -83,30 +94,33 @@ module snake_game(
         .x_list(x_list),          // INPUT 189bit x coordinates
         .y_list(y_list),          // INPUT 189bit y coordinates
         .length(length),          // INPUT length of snake
-          .disp_data(disp_data)     // OUTPUT 8byte 8x8 LED matrix data
+        .disp_data(disp_data)     // OUTPUT 8byte 8x8 LED matrix data
     );
 
 // -----------------------------------------------------------------------------
 // VGA display
 // -----------------------------------------------------------------------------
-    wire [1:0] game_switch;       // Switch to control display mode
-    // reg [2:0] rgb_output;         // RGB output signal for VGA
+    // Instantiate visual_data
+    visual_data visual_data_inst (
+        .clock(clk),
+        .vga_clk(vga_clk),
+        .switch(game_switch),
+        .hcount(hcount),
+        .vcount(vcount),
+        .data(data)
+    );
 
+    // Instantiate VGA
     VGA vga_inst (
-        .clock(clk),              // INPUT Clock
-        .switch(game_switch),     // INPUT Keep this simple for now
-          .disp_RGB(disp_RGB),      // OUTPUT RGB VGA pins
-          .hsync(hsync),            // OUTPUT Horizontal sync pin
-          .vsync(vsync)             // OUTPUT Vertical sync pin
+        .clock(clk),
+        .vga_clk(vga_clk),
+        .data(data),
+        .hcount(hcount),
+        .vcount(vcount),
+        .disp_RGB(disp_RGB),
+        .hsync(hsync),
+        .vsync(vsync)
     ); 
 
-//    // Generate a black or white screen (Basic VGA output)
-//    always @(posedge clk) begin
-//            rgb_output <= 3'b111;         // Set to white
-//    end
-//
-//    // Keep game_switch constant (e.g., 2'b00)
-//    assign game_switch = 2'b00;         // Always show horizontal data    
-
 endmodule
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////

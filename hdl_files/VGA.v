@@ -4,34 +4,28 @@
 // Description : Responsible for drawing to monitor using VGA    
 ////////////////////////////////////////////////////////////////////////////////
 module VGA(
-	clock,
-	switch,
-	disp_RGB,
-	hsync,
-	vsync
+    clock,
+    vga_clk,
+    data,
+    hcount,
+    vcount,
+    disp_RGB,
+    hsync,
+    vsync
 );
 
 input  clock;     // 50MHz
-input  [1:0]switch;	// 2-bit input switch
-output [2:0]disp_RGB;    // 3-bit VGA display colors
+input  vga_clk;   // VGA clock input
+input  [2:0] data;       // 3-bit data input (from visual_data module)
+output [2:0] disp_RGB;    // 3-bit VGA display colors
 output  hsync;     // VGA horizontal sync signal
 output  vsync;     // VGA vertical sync signal
+output [9:0] hcount; // Horizontal counter output
+output [9:0] vcount; // Vertical counter output
 
 // Assigning registers
-reg [9:0] hcount;     // 10-bit reg for Horizontal counter
-reg [9:0] vcount;     // 10-bit reg for Vertical counter
-reg [2:0] data;		// 3-bit reg for data
-reg [2:0] h_dat;		// 3-bit reg for horizontal data
-reg [2:0] v_dat;		// 3-bit reg for vertical data
-
-//reg [9:0] timer
-reg flag;
-wire hcount_ov; 	// Horizontal counter overflow
-wire vcount_ov; 	// Vertical counter overflow
-wire dat_act;		// Data active signal
-wire hsync;
-wire vsync;
-reg vga_clk; 		// Register for VGA clock
+reg [9:0] hcount_reg;     // 10-bit reg for Horizontal counter
+reg [9:0] vcount_reg;     // 10-bit reg for Vertical counter
 
 // VGA timing parameters
 parameter hsync_end   = 10'd95,	 // End of Horizontal sync
@@ -43,23 +37,20 @@ parameter hsync_end   = 10'd95,	 // End of Horizontal sync
 	vdat_end  = 10'd514,			// End of Vertical data
 	vline_end  = 10'd524;		// End of Vertical lines
 
-
-// VGA clock generation
-always @(posedge clock) 	// On the rising edge of the VGA clock signal
-begin
-	vga_clk = ~vga_clk;		// Toggles VGA clock signal
-end
-
+wire hcount_ov; 	// Horizontal counter overflow
+wire vcount_ov; 	// Vertical counter overflow
+wire dat_act;		// Data active signal
 
 // Horizontal counter   
 always @(posedge vga_clk)		// On the rising edge of the VGA clock signal
 begin
 	if (hcount_ov)		// If horizontal counter overflows
-		hcount <= 10'd0; 	// Reset horizontal counter
+		hcount_reg <= 10'd0; 	// Reset horizontal counter
 	else
-		hcount <= hcount + 10'd1;	// Increment horizontal counter
+		hcount_reg <= hcount_reg + 10'd1;	// Increment horizontal counter
 end
-assign hcount_ov = (hcount == hpixel_end);	// Horizontal counter overflow condition
+assign hcount_ov = (hcount_reg == hpixel_end);	// Horizontal counter overflow condition
+assign hcount = hcount_reg;  // Output hcount
 
 //Vertical counter
 always @(posedge vga_clk)
@@ -67,81 +58,24 @@ begin
 	if (hcount_ov)	//  If horizontal counter overflows
 	begin
 		if (vcount_ov)	// If vertical counter overflows
-			vcount <= 10'd0;	// Reset vertical counter
+			vcount_reg <= 10'd0;	// Reset vertical counter
 		else
-			vcount <= vcount + 10'd1;	// Increment vertical counter
+			vcount_reg <= vcount_reg + 10'd1;	// Increment vertical counter
 	end
 end
-assign  vcount_ov = (vcount == vline_end);	// Vertical counter overflow condition
-//���ݡ�ͬ���ź���
-assign dat_act = ((hcount >= hdat_begin) && (hcount < hdat_end))	// Assign Data active condition
-              && ((vcount >= vdat_begin) && (vcount < vdat_end));		
-assign hsync = (hcount > hsync_end);		// Assign Horizontal sync signal
-assign vsync = (vcount > vsync_end);		// Assign Vertical sync signal
-assign disp_RGB = (dat_act) ?  data : 3'h00;      // Assign Display RGB data 
+assign  vcount_ov = (vcount_reg == vline_end);	// Vertical counter overflow condition
+assign vcount = vcount_reg;  // Output vcount
 
-//************************��ʾ���ݴ�������******************************* 
-//ͼƬ��ʾ��ʱ������
-/*always @(posedge vga_clk)
-begin
- flag <= vcount_ov;
- if(vcount_ov && ~flag)
-  timer <= timer + 1'b1;
-end
-*/
+// Data active signal
+assign dat_act = ((hcount_reg >= hdat_begin) && (hcount_reg < hdat_end))	
+              && ((vcount_reg >= vdat_begin) && (vcount_reg < vdat_end));		
 
-// Data Selection
-always @(posedge vga_clk)
-begin
-	case(switch[1:0])
-		2'd0: data <= h_dat;      // Select horizontal data
-		2'd1: data <= v_dat;      // Select vertical data
-		2'd2: data <= (v_dat ^ h_dat); // XOR of vertical and horizontal data
-		2'd3: data <= (v_dat ~^ h_dat); // XNOR of vertical and horizontal data
-	endcase
-end
+// Synchronization signals
+assign hsync = (hcount_reg > hsync_end);		// Assign Horizontal sync signal
+assign vsync = (vcount_reg > vsync_end);		// Assign Vertical sync signal
 
-// Vertical Data generation
-always @(posedge vga_clk)
-begin
-	if(hcount < 223)
-		v_dat <= 3'h7;      // Color 7
-	else if(hcount < 303)
-		v_dat <= 3'h6;   // Color 6
-	else if(hcount < 383)
-		v_dat <= 3'h5;   // Color 5
-	else if(hcount < 463)
-		v_dat <= 3'h4;    // Color 4
-	else if(hcount < 543)
-		v_dat <= 3'h3;   // Color 3
-	else if(hcount < 623)
-		v_dat <= 3'h2;   // Color 2
-	else if(hcount < 703)
-		v_dat <= 3'h1;   // Color 1
-	else 
-		v_dat <= 3'h0;   // Color 0
-end
-
-// Horizontal Data generation
-always @(posedge vga_clk)
-begin
-	if(vcount < 94)
-		h_dat <= 3'h7;        // Color 7
-	else if(vcount < 154)
-		h_dat <= 3'h6;   // Color 6
-	else if(vcount < 214)
-		h_dat <= 3'h5;   // Color 5
-	else if(vcount < 274)
-		h_dat <= 3'h4;    // Color 4
-	else if(vcount < 334)
-		h_dat <= 3'h3;   // Color 3
-	else if(vcount < 394)
-		h_dat <= 3'h2;   // Color 2
-	else if(vcount < 454)
-		h_dat <= 3'h1;   // Color 1
-	else 
-		h_dat <= 3'h0;   // Color 0
-end
+// Display RGB data assignment
+assign disp_RGB = (dat_act) ? data : 3'h00;      // Assign Display RGB data 
 
 endmodule
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////

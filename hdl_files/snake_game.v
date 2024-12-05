@@ -13,19 +13,14 @@ module snake_game(
     input ps2_data,                // PS2 data pin 
     input clk,                     // 50Mhz FPGA clock
     input rst_n,                   // reset button
-    output wire [7:0] line_data,   // 1byte column data for LED matrix
-    output wire [7:0] row,         // 1byte row position data for LED matrix
     output wire [2:0] disp_RGB,    // 3-bit VGA display colors
     output wire hsync,             // VGA horizontal sync signal
-    output wire vsync,             // VGA vertical sync signal
-    output wire [1:0] dig,         // 7-segment display digital tube pins
-    output wire [7:0] seg          // 7-segment 8bit display segment pins
+    output wire vsync              // VGA vertical sync signal
 );
 
     // internal signals
     wire [188:0] x_list;               // 3bit x coordinates, 63 snake segments
     wire [188:0] y_list;               // 3bit y coordinate, 63 snake segments
-    wire [63:0] disp_data;             // display data for the 8x8 LED matrix
     wire [5:0] length;                 // length of the snake
     wire [7:0] ps2_byte;               // 1byte hex key value
     wire slow_clk;                     // general clock
@@ -92,20 +87,6 @@ module snake_game(
     );
 
 // -----------------------------------------------------------------------------
-// Peripheral screens
-// -----------------------------------------------------------------------------
-// 1602 LCD Screen will go here
-//
-//
-    // 7-segment display
-    seven_segment_dual	seven_segment(.clk(slow_clk),      // INPUT 5KHz
-                                      .rst_n(rst_n),       // INPUT reset button
-                                      .ps2_byte(ps2_byte), // INPUT 1byte hex
-                                        .dig(dig),           // OUTPUT dig pins
-                                        .seg(seg)            // OUTPUT seg pins
-    );
-
-// -----------------------------------------------------------------------------
 // VGA display
 // -----------------------------------------------------------------------------
     wire [1:0] game_switch;       // Switch to control display mode
@@ -125,19 +106,7 @@ module snake_game(
 //    end
 //
 //    // Keep game_switch constant (e.g., 2'b00)
-//    assign game_switch = 2'b00;         // Always show horizontal data
-
-// -----------------------------------------------------------------------------
-// Test screen output - # Will be commented out for final version
-// -----------------------------------------------------------------------------
-// 8-byte demultiplexer for output on 8x8 LED matrix for testing game logic
-led_matrix led_matrix (
-    .clk(slow_clk),         // INPUT 5KHz
-    .rst_n(rst_n),          // INPUT reset button
-    .disp_data(disp_data),  // INPUT 8byte data
-     .line_data(line_data),  // OUTPUT 1byte row data
-     .row(row)               // OUTPUT 1byte column data
-);       
+//    assign game_switch = 2'b00;         // Always show horizontal data    
 
 endmodule
 //////////////////////////////////////////////////////////////////////////////

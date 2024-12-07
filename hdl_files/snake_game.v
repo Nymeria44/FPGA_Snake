@@ -33,7 +33,6 @@ module snake_game(
 	 // -----------------------------------------------------------------------------
 	 // Clock signals for the game
 	 // -----------------------------------------------------------------------------
-
 	// Generate 40MHz VGA clock using PLL
 	PLL_IP pll_inst (
 		 .inclk0(clk),      // 50 MHz input clock

@@ -28,7 +28,7 @@ module snake_game(
     wire [2:0] data;
     wire vga_clk;
 
-    assign game_switch = 2'b00;    // Always show horizontal data
+    assign game_switch = 2'b10;    // Always show horizontal data
 
 	 // -----------------------------------------------------------------------------
 	 // Clock signals for the game

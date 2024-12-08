@@ -16,6 +16,7 @@ module VGA_TB;
     wire [2:0] disp_RGB;
     wire hsync;
     wire vsync;
+	 wire vga_clk;
 
     // Instantiating top level module
     snake_game dut (
@@ -25,7 +26,8 @@ module VGA_TB;
         .rst_n(rst_n),
         .disp_RGB(disp_RGB),
         .hsync(hsync),
-        .vsync(vsync)
+        .vsync(vsync),
+		  .vga_clk(vga_clk)
     );
 
     // Generate a stable 50 MHz clock (20 ns period)
@@ -44,9 +46,9 @@ module VGA_TB;
         // Deassert reset
         rst_n = 1;
 
-        // Run simulation for some time to observe behavior
-        // 20 ms should allow multiple frames at 60 Hz (16.7 ms/frame)
-        #20_000_000;
+        // Setting simulation time
+		  // As it takes 16.7 ms/frame, allow 35ms for two frame ticks
+        #35_000_000;
 
         $stop; // End simulation
     end

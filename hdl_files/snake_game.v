@@ -12,7 +12,8 @@ module snake_game(
     input rst_n,                   // reset button
     output wire [2:0] disp_RGB,    // 3-bit VGA display colors
     output wire hsync,             // VGA horizontal sync signal
-    output wire vsync              // VGA vertical sync signal
+    output wire vsync,              // VGA vertical sync signal
+	 output wire vga_clk            // Exposing VGA clock for testbenching
 );
 
     // Internal signals
@@ -26,7 +27,7 @@ module snake_game(
     wire [9:0] hcount;
     wire [9:0] vcount;
     wire [2:0] data;
-    wire vga_clk;
+    // wire vga_clk;					  // Commented out while clock is exposed for TB
 
     assign game_switch = 2'b10;    // Always show horizontal data
 

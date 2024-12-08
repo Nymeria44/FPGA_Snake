@@ -11,7 +11,7 @@
 // -----------------------------------------------------------------------------
 module snake(
     input clk,					    // clock
-	input slow_clk,				    // slow game clock
+	 input slow_clk,				    // slow game clock
     input rst_n,                    // reset signal
     input [188:0] x_list,		    // 3bit x coordinate for 63 snake segments
     input [188:0] y_list,		    // 3bit y coordinate for 63 snake segments

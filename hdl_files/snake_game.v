@@ -95,8 +95,8 @@ module snake_game(
     // -----------------------------------------------------------------------------
     // VGA display
     // -----------------------------------------------------------------------------
-    // Instantiate visual_data
-    visual_data visual_data_inst (
+    // Generate checkerboard pattern
+    checkerboard_pattern visual_data_inst (
         .clock(vga_clk),
         .switch(game_switch),
         .hcount(hcount),

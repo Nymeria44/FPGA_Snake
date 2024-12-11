@@ -15,7 +15,10 @@ module VGA(
     output [9:0] vcount      // Vertical counter output
 );
 
-    // VGA timing parameters
+// -----------------------------------------------------------------------------
+// Defining VGA parameters
+// -----------------------------------------------------------------------------
+	 // Defining VGA timing parameters locally (from res_params.vh)
     localparam h_active = `H_ACTIVE;
     localparam h_fp = `H_FP;
     localparam h_sync = `H_SYNC;
@@ -38,6 +41,9 @@ module VGA(
     reg [10:0] hcount_reg = 0;  // 11-bit counter for horizontal pixels
     reg [10:0] vcount_reg = 0;  // 11-bit counter for vertical lines
 
+	 // -----------------------------------------------------------------------------
+    // VGA logic
+    // -----------------------------------------------------------------------------
     // Horizontal counter
     always @(posedge clock) begin
         if (hcount_reg == h_total - 1)

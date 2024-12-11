@@ -22,7 +22,10 @@ module game_logic (
     output reg [11:0] score
 );
 
-    // Parameters (using defines from res_params.vh)
+// -----------------------------------------------------------------------------
+// Defining game state parameters
+// -----------------------------------------------------------------------------
+	 // Defining screen resolution parameters locally (from res_params.vh)
     localparam SCREEN_WIDTH = `SCREEN_WIDTH;
     localparam SCREEN_HEIGHT = `SCREEN_HEIGHT;
     localparam FOOD_WIDTH = `FOOD_WIDTH;
@@ -55,7 +58,10 @@ module game_logic (
     localparam TICK_MAX = 2000000; // Adjust game speed as needed
 
     wire game_tick = (tick_count == TICK_MAX);
-
+	 
+// -----------------------------------------------------------------------------
+// VGA logic
+// -----------------------------------------------------------------------------
     // Initialize
     integer i;
     initial begin
@@ -188,3 +194,4 @@ module game_logic (
     end
 
 endmodule
+////////////////////////////////////////////////////////////////////////////////

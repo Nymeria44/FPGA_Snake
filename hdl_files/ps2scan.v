@@ -14,9 +14,9 @@ module ps2scan(
     input clk,			    	// clock
     input rst_n,			    // reset signal
     input ps2k_clk,			    // ps2 clock signal	
-	input ps2k_data,		    // PS2 data signal	
-	output[7:0] ps2_byte, 	    // scancode value
-	output ps2_state            // keypress state
+  	 input ps2k_data,		    // PS2 data signal	
+	 output[7:0] ps2_byte, 	    // scancode value
+	 output ps2_state            // keypress state
 );
 
 // -----------------------------------------------------------------------------
@@ -249,3 +249,4 @@ module ps2scan(
     end
 
 endmodule
+////////////////////////////////////////////////////////////////////////////////

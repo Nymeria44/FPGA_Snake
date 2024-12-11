@@ -111,6 +111,7 @@ set_global_assignment -name EDA_TEST_BENCH_NAME VGA_TB -section_id eda_simulatio
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id VGA_TB
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME VGA_TB -section_id VGA_TB
 set_global_assignment -name EDA_TEST_BENCH_FILE testbench_files/VGA_TB.v -section_id VGA_TB
+set_global_assignment -name VERILOG_FILE hdl_files/ps2scan.v
 set_global_assignment -name VERILOG_FILE hdl_files/VGA.v
 set_global_assignment -name VERILOG_FILE hdl_files/game_state.v
 set_global_assignment -name VERILOG_FILE hdl_files/checkerboard_pattern.v
@@ -118,20 +119,10 @@ set_global_assignment -name SDC_FILE hdl_files/timer_VGA.sdc
 set_global_assignment -name VERILOG_FILE hdl_files/edge_synch.v
 set_global_assignment -name VERILOG_FILE testbench_files/snake_game_TB.v
 set_global_assignment -name VERILOG_FILE testbench_files/random_num_TB.v
-set_global_assignment -name VERILOG_FILE testbench_files/ps2_key_TB.v
-set_global_assignment -name VERILOG_FILE testbench_files/led_matrix_TB.v
-set_global_assignment -name VERILOG_FILE testbench_files/coordinate_update_TB.v
 set_global_assignment -name VERILOG_FILE testbench_files/clock_divider_TB.v
-set_global_assignment -name VERILOG_FILE hdl_files/snake.v
-set_global_assignment -name VERILOG_FILE hdl_files/seven_segment_dual.v
 set_global_assignment -name VERILOG_FILE hdl_files/random_num.v
-set_global_assignment -name VERILOG_FILE hdl_files/ps2scan.v
-set_global_assignment -name VERILOG_FILE hdl_files/ps2_key.v
-set_global_assignment -name VERILOG_FILE hdl_files/led_matrix.v
-set_global_assignment -name VERILOG_FILE hdl_files/coordinate_update.v
 set_global_assignment -name VERILOG_FILE hdl_files/clock_divider.v
 set_global_assignment -name VERILOG_FILE hdl_files/snake_game.v
-set_global_assignment -name VERILOG_FILE hdl_files/visual_data.v
 set_global_assignment -name QIP_FILE PLL_IP.qip
 set_global_assignment -name VERILOG_FILE testbench_files/VGA_TB.v
 set_global_assignment -name SOURCE_FILE db/snake_game.cmp.rdb

@@ -3,6 +3,8 @@
 // Dependencies:
 // Description : Responsible for drawing to monitor using VGA    
 ////////////////////////////////////////////////////////////////////////////////
+`include "res_params.v"
+
 module VGA(
     input clock,             // 40MHz pixel clock
     input [2:0] data,        // 3-bit data input (from visual_data module)
@@ -13,18 +15,18 @@ module VGA(
     output [9:0] vcount      // Vertical counter output
 );
 
-    // VGA timing parameters for 800x600 @ 60Hz
-    parameter h_active = 800;
-    parameter h_fp = 40;
-    parameter h_sync = 128;
-    parameter h_bp = 88;
-    parameter h_total = h_active + h_fp + h_sync + h_bp;  // 1056
+    // VGA timing parameters
+    parameter h_active = res_params.h_active;
+    parameter h_fp = res_params.h_fp;
+    parameter h_sync = res_params.h_sync;
+    parameter h_bp = res_params.h_bp;
+    parameter h_total = res_params.h_total;
 
-    parameter v_active = 600;
-    parameter v_fp = 1;
-    parameter v_sync = 4;
-    parameter v_bp = 23;
-    parameter v_total = v_active + v_fp + v_sync + v_bp;  // 628
+    parameter v_active = res_params.v_active;
+    parameter v_fp = res_params.v_fp;
+    parameter v_sync = res_params.v_sync;
+    parameter v_bp = res_params.v_bp;
+    parameter v_total = res_params.v_total;
 
     // Timing positions
     parameter hsync_start = h_active + h_fp;

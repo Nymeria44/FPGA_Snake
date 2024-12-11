@@ -3,19 +3,20 @@
 // Dependencies:
 // Description : Determining the statee of the game
 ////////////////////////////////////////////////////////////////////////////////
+`include "res_params.v"
 `timescale 1ns / 1ps
 
 module game_logic #(
-    parameter SCREEN_WIDTH = 1024,
-    parameter SCREEN_HEIGHT = 768,
-    parameter FOOD_WIDTH = 16,
-    parameter HEAD_WIDTH = 16,
-    parameter SNAKE_BEGIN_X = 300,
-    parameter SNAKE_BEGIN_Y = 450,
-    parameter SNAKE_LENGTH_BEGIN = 4,
-    parameter SNAKE_LENGTH_MAX = 50,
-    parameter FOOD_BEGIN_X = 800,
-    parameter FOOD_BEGIN_Y = 500
+    parameter SCREEN_WIDTH = res_params.SCREEN_WIDTH,
+    parameter SCREEN_HEIGHT = res_params.SCREEN_HEIGHT,
+    parameter FOOD_WIDTH = res_params.FOOD_WIDTH,
+    parameter HEAD_WIDTH = res_params.HEAD_WIDTH,
+    parameter SNAKE_BEGIN_X = res_params.SNAKE_BEGIN_X,
+    parameter SNAKE_BEGIN_Y = res_params.SNAKE_BEGIN_Y,
+    parameter SNAKE_LENGTH_BEGIN = res_params.SNAKE_LENGTH_BEGIN,
+    parameter SNAKE_LENGTH_MAX = res_params.SNAKE_LENGTH_MAX,
+    parameter FOOD_BEGIN_X = res_params.FOOD_BEGIN_X,
+    parameter FOOD_BEGIN_Y = res_params.FOOD_BEGIN_Y
 )(
     input wire clk65Mhz,
     input wire [1:0] direction,  // 00-up, 01-right, 10-down, 11-left

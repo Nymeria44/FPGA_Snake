@@ -3,22 +3,11 @@
 // Dependencies:
 // Description : Determining the statee of the game
 ////////////////////////////////////////////////////////////////////////////////
-`include "res_params.v"
+`include "res_params.vh"
 `timescale 1ns / 1ps
 
-module game_logic #(
-    parameter SCREEN_WIDTH = res_params.SCREEN_WIDTH,
-    parameter SCREEN_HEIGHT = res_params.SCREEN_HEIGHT,
-    parameter FOOD_WIDTH = res_params.FOOD_WIDTH,
-    parameter HEAD_WIDTH = res_params.HEAD_WIDTH,
-    parameter SNAKE_BEGIN_X = res_params.SNAKE_BEGIN_X,
-    parameter SNAKE_BEGIN_Y = res_params.SNAKE_BEGIN_Y,
-    parameter SNAKE_LENGTH_BEGIN = res_params.SNAKE_LENGTH_BEGIN,
-    parameter SNAKE_LENGTH_MAX = res_params.SNAKE_LENGTH_MAX,
-    parameter FOOD_BEGIN_X = res_params.FOOD_BEGIN_X,
-    parameter FOOD_BEGIN_Y = res_params.FOOD_BEGIN_Y
-)(
-    input wire clk65Mhz,
+module game_logic (
+    input wire clk,
     input wire [1:0] direction,  // 00-up, 01-right, 10-down, 11-left
     input wire stop,
     input wire reset,
@@ -32,6 +21,18 @@ module game_logic #(
     output reg is_head,
     output reg [11:0] score
 );
+
+    // Parameters (using defines from res_params.vh)
+    localparam SCREEN_WIDTH = `SCREEN_WIDTH;
+    localparam SCREEN_HEIGHT = `SCREEN_HEIGHT;
+    localparam FOOD_WIDTH = `FOOD_WIDTH;
+    localparam HEAD_WIDTH = `HEAD_WIDTH;
+    localparam SNAKE_BEGIN_X = `SNAKE_BEGIN_X;
+    localparam SNAKE_BEGIN_Y = `SNAKE_BEGIN_Y;
+    localparam SNAKE_LENGTH_BEGIN = `SNAKE_LENGTH_BEGIN;
+    localparam SNAKE_LENGTH_MAX = `SNAKE_LENGTH_MAX;
+    localparam FOOD_BEGIN_X = `FOOD_BEGIN_X;
+    localparam FOOD_BEGIN_Y = `FOOD_BEGIN_Y;
 
     // Internal parameters and signals
     localparam DIR_UP    = 2'b00;
@@ -72,7 +73,7 @@ module game_logic #(
     end
 
     // Game tick generation
-    always @(posedge clk65Mhz or posedge reset) begin
+    always @(posedge clk or posedge reset) begin
         if (reset) begin
             tick_count <= 32'd0;
         end else begin
@@ -87,7 +88,7 @@ module game_logic #(
     end
 
     // Update direction if game tick occurs
-    always @(posedge clk65Mhz or posedge reset) begin
+    always @(posedge clk or posedge reset) begin
         if (reset) begin
             current_dir <= DIR_RIGHT;
         end else if (game_tick && !stop) begin
@@ -96,7 +97,7 @@ module game_logic #(
     end
 
     // Snake movement and logic
-    always @(posedge clk65Mhz or posedge reset) begin
+    always @(posedge clk or posedge reset) begin
         if (reset) begin
             score <= 12'd0;
             snake_len <= SNAKE_LENGTH_BEGIN;

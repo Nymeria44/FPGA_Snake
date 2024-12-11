@@ -3,7 +3,7 @@
 // Dependencies:
 // Description : Responsible for drawing to monitor using VGA    
 ////////////////////////////////////////////////////////////////////////////////
-`include "res_params.v"
+`include "res_params.vh"
 
 module VGA(
     input clock,             // 40MHz pixel clock
@@ -16,17 +16,17 @@ module VGA(
 );
 
     // VGA timing parameters
-    parameter h_active = res_params.h_active;
-    parameter h_fp = res_params.h_fp;
-    parameter h_sync = res_params.h_sync;
-    parameter h_bp = res_params.h_bp;
-    parameter h_total = res_params.h_total;
+    localparam h_active = `H_ACTIVE;
+    localparam h_fp = `H_FP;
+    localparam h_sync = `H_SYNC;
+    localparam h_bp = `H_BP;
+    localparam h_total = `H_TOTAL;
 
-    parameter v_active = res_params.v_active;
-    parameter v_fp = res_params.v_fp;
-    parameter v_sync = res_params.v_sync;
-    parameter v_bp = res_params.v_bp;
-    parameter v_total = res_params.v_total;
+    localparam v_active = `V_ACTIVE;
+    localparam v_fp = `V_FP;
+    localparam v_sync = `V_SYNC;
+    localparam v_bp = `V_BP;
+    localparam v_total = `V_TOTAL;
 
     // Timing positions
     parameter hsync_start = h_active + h_fp;

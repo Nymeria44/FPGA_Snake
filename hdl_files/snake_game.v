@@ -72,26 +72,9 @@ module snake_game(
     // -----------------------------------------------------------------------------
     // Game logic and display processing
     // -----------------------------------------------------------------------------
-    // Check position of snake and encode 3-bit x,y coordinates into 189-bit data
-    coordinate_update coord_update (
-        .clk(game_clk),                    // INPUT 5Hz game clock
-        .rst_n(rst_n),                     // INPUT reset button
-        .ps2ascii(ps2_byte),               // INPUT raw keyboard input
-        .x_list(x_list),                   // OUTPUT 189-bit x coordinates
-        .y_list(y_list),                   // OUTPUT 189-bit y coordinates
-        .length(length)                    // OUTPUT length of snake
-    );
-
-    // Slice 189-bit data to 3-bit coordinates, output 64 bits for LED matrix
-    snake snake (
-        .clk(slow_clk),                    // INPUT 5KHz 
-        .slow_clk(game_clk),               // INPUT 5Hz game clock
-        .rst_n(rst_n),                     // INPUT reset button
-        .x_list(x_list),                   // INPUT 189-bit x coordinates
-        .y_list(y_list),                   // INPUT 189-bit y coordinates
-        .length(length),                   // INPUT length of snake
-        .disp_data(disp_data)              // OUTPUT 8-byte 8x8 LED matrix data
-    );
+    // game_state game_state_inst (
+	 //
+	 // );
 
     // -----------------------------------------------------------------------------
     // VGA display

@@ -172,28 +172,35 @@ module game_state (
 // ----------------------------------------------------------------------------
 // Creating pixel maps from game state
 // ----------------------------------------------------------------------------
-    always @(*) begin
-        is_body = 1'b0;
-        is_head = 1'b0;
-        is_food = 1'b0;
-        if (en) begin
-            // Check head
-            if (col == snake_x[0] && row == snake_y[0]) begin
-                is_head = 1'b1;
-            end else begin
-                // Check body
-                for (i_collision = 1; i_collision < SNAKE_LENGTH_MAX; i_collision = i_collision + 1) begin
-                    if (i_collision < snake_len && col == snake_x[i_collision] && row == snake_y[i_collision]) begin
-                        is_body = 1'b1;
-                    end
-                end
-            end
-            // Check food
-            if (col == food_x && row == food_y) begin
-                is_food = 1'b1;
-            end
-        end
-    end
+	always @(*) begin
+		 is_body = 1'b0;
+		 is_head = 1'b0;
+		 is_food = 1'b0;
+
+		 if (en) begin
+			  // Check head block
+			  if ((col >= snake_x[0]) && (col < snake_x[0] + HEAD_WIDTH) &&
+					(row >= snake_y[0]) && (row < snake_y[0] + HEAD_WIDTH)) begin
+					is_head = 1'b1;
+			  end else begin
+					// Check each body segment as a block
+					for (i_collision = 1; i_collision < SNAKE_LENGTH_MAX; i_collision = i_collision + 1) begin
+						 if (i_collision < snake_len &&
+							  (col >= snake_x[i_collision]) && (col < snake_x[i_collision] + HEAD_WIDTH) &&
+							  (row >= snake_y[i_collision]) && (row < snake_y[i_collision] + HEAD_WIDTH)) begin
+							  is_body = 1'b1;
+						 end
+					end
+			  end
+
+			  // Check food block
+			  if ((col >= food_x) && (col < food_x + FOOD_WIDTH) &&
+					(row >= food_y) && (row < food_y + FOOD_WIDTH)) begin
+					is_food = 1'b1;
+			  end
+		 end
+	end
+
 
 endmodule
 //////////////////////////////////////////////////////////////////////////////

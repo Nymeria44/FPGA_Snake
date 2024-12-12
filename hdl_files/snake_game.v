@@ -8,6 +8,10 @@
 module snake_game(
     input clk,                     // 50MHz FPGA clock
     input rst_n,                   // reset button
+	 input S1,                      // Up button
+    input S2,                      // Right button
+    input S3,                      // Down button
+    input S4,                      // Left button
     output wire [2:0] disp_RGB,    // 3-bit VGA display colors
     output wire hsync,             // VGA horizontal sync signal
     output wire vsync,              // VGA vertical sync signal
@@ -55,8 +59,41 @@ module snake_game(
 // -----------------------------------------------------------------------------
 // Player input
 // -----------------------------------------------------------------------------
+    // Direction constants:
+    localparam DIR_UP    = 2'b00;
+    localparam DIR_RIGHT = 2'b01;
+    localparam DIR_DOWN  = 2'b10;
+    localparam DIR_LEFT  = 2'b11;
+    
+	 reg [1:0] current_direction, next_direction;
 
-// Play input missing
+    always @(*) begin
+        // Start by assuming no change in direction
+        next_direction = current_direction;
+
+        // Check each button. Priority can be set by order; first match wins.
+        // Ensure we are not reversing direction.
+        if (!S1 && current_direction != DIR_DOWN) begin
+            next_direction = DIR_UP;
+        end else if (!S2 && current_direction != DIR_LEFT) begin
+            next_direction = DIR_RIGHT;
+        end else if (!S3 && current_direction != DIR_UP) begin
+            next_direction = DIR_DOWN;
+        end else if (!S4 && current_direction != DIR_RIGHT) begin
+            next_direction = DIR_LEFT;
+        end
+    end
+
+    // Update direction on the rising edge of the game clock or on reset
+    always @(posedge game_clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Set initial direction to RIGHT
+            current_direction <= DIR_RIGHT;
+        end else begin
+            current_direction <= next_direction;
+        end
+    end
+
 
 // -----------------------------------------------------------------------------
 // Game logic and display processing
@@ -65,7 +102,7 @@ module snake_game(
 	 // Commented out as it puts project over element limit
     game_state game_state_inst (
         .clk(game_clk),
-        .direction(2'b01),
+        .direction(current_direction),
         .stop(1'b0),
         .reset(!rst_n),
         .row({6'b0, vcount}),

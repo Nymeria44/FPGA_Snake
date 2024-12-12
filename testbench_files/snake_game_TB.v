@@ -34,7 +34,7 @@ module snake_game_TB;
     always #10 clk = ~clk;  //50Mhz clock
 
     initial begin
-        clk = 0;            // Initialize signals
+        clk = 0;            // Initialise signals
         rst_n = 0;
         #100 rst_n = 1;     // Release reset after 100ns
         #50000000;          // Run the simulation for 50ms

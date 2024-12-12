@@ -18,9 +18,11 @@ module checkerboard_pattern(
     wire [9:0] hx_block = hcount / SQUARE_SIZE;  
     wire [9:0] vy_block = vcount / SQUARE_SIZE;  
 
-    // XOR to determine color: if XOR is 1, white; else black
+    // Determining colour
     wire is_white = (hx_block[0] ^ vy_block[0]);
 
+	 // Note: Switch statement is hard coded to game logic.
+	 // Current switch is just demonstration it works with this functionality
     always @(posedge clock) begin
         case(switch)
             2'd0: data <= 3'b111; // Mode 0: All white screen

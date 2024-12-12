@@ -19,6 +19,8 @@ module snake_display(
     output reg  [2:0]  data
 );
 
+	 // Note: Switch statement is hard coded to game logic.
+	 // Current switch is just demonstration it works with this functionality
     always @(posedge clock) begin
         case (switch)
             2'd0: begin

@@ -10,7 +10,7 @@ module VGA_TB;
     reg ps2_clk;
     reg ps2_data;
     reg clk;        // 50MHz clock input
-    reg rst_n;      // active-low reset
+    reg rst_n;
 
     // Outputs from snake_game
     wire [2:0] disp_RGB;
@@ -18,7 +18,7 @@ module VGA_TB;
     wire vsync;
 	 wire vga_clk;
 
-    // Instantiating top level module
+    // Loading top-level module
     snake_game dut (
         .ps2_clk(ps2_clk),
         .ps2_data(ps2_data),
@@ -34,7 +34,7 @@ module VGA_TB;
     always #10 clk = ~clk;
 
     initial begin
-        // Initialize signals
+        // Initialise signals
         clk     = 0;
         rst_n   = 0;
         ps2_clk = 1;

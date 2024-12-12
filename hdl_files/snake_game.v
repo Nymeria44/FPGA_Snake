@@ -8,10 +8,10 @@
 module snake_game(
     input clk,                     // 50MHz FPGA clock
     input rst_n,                   // reset button
-	 input S1,                      // Up button
-    input S2,                      // Right button
+	 input S1,                      // Left button
+    input S2,                      // Up button
     input S3,                      // Down button
-    input S4,                      // Left button
+    input S4,                      // Right button
     output wire [2:0] disp_RGB,    // 3-bit VGA display colors
     output wire hsync,             // VGA horizontal sync signal
     output wire vsync,              // VGA vertical sync signal
@@ -19,10 +19,9 @@ module snake_game(
 );
 
 // -----------------------------------------------------------------------------
-// Assigning internal wires
+// Assigning internal wires/parameters
 // -----------------------------------------------------------------------------
-    // Clock / VGA internal signals
-    wire slow_clk;                 // general clock
+    // Clock/VGA internal signals
     wire game_clk;                 // game clock (5Mhz)
     wire pll_locked;
     wire [9:0] hcount;
@@ -37,6 +36,14 @@ module snake_game(
     wire is_food;
     wire is_head;
     wire [11:0] score;
+	 
+	 // Direction constants (for movement)
+    localparam DIR_UP    = 2'b00;
+    localparam DIR_RIGHT = 2'b01;
+    localparam DIR_DOWN  = 2'b10;
+    localparam DIR_LEFT  = 2'b11;
+    
+	 reg [1:0] current_direction;
 
 // -----------------------------------------------------------------------------
 // Clock signals
@@ -48,26 +55,21 @@ module snake_game(
 		  .locked(pll_locked)
 	 );
 
-	 // 5MHZ clock
+	 // 5MHZ game clock
     clock_divider very_slow_clock_divider(
         .clk_in(clk),
         .reset(rst_n),
         .ratio(32'd10_000_000),            // dividing ratio
         .clk_out(game_clk)
     );
-
-
-    // Direction constants:
-    localparam DIR_UP    = 2'b00;
-    localparam DIR_RIGHT = 2'b01;
-    localparam DIR_DOWN  = 2'b10;
-    localparam DIR_LEFT  = 2'b11;
-    
-	 reg [1:0] current_direction;
+	 
 // -----------------------------------------------------------------------------
 // Player input
 // -----------------------------------------------------------------------------
-    always @(*) begin
+    // Setting current direction based off FPGA keys
+	 // Note: conditions for legal movement handled within game_state
+	 // Note: controls use vim style (h,j,l,k keybinds) for movement
+	 always @(*) begin
         if (!S1) begin
             current_direction = DIR_LEFT;
         end else if (!S2) begin
@@ -82,8 +84,6 @@ module snake_game(
 // -----------------------------------------------------------------------------
 // Game logic and display processing
 // -----------------------------------------------------------------------------
-    // Hard-code direction to right as play input missing
-	 // Commented out as it puts project over element limit
     game_state game_state_inst (
         .clk(game_clk),
         .direction(current_direction),
@@ -100,7 +100,8 @@ module snake_game(
 // -----------------------------------------------------------------------------
 // VGA display
 // -----------------------------------------------------------------------------
-    // Initalise VGA
+// Note: Comment out snake_display to use checkerboard_pattern and vice versa
+    // Init VGA
     VGA vga_inst (
         .clock(vga_clk),
         .data(data),
@@ -111,6 +112,17 @@ module snake_game(
         .vsync(vsync)
     );
 	 
+	 // Converts snake/food coordinates into RBG data
+	 snake_display visual_data_inst (
+	     .clock(vga_clk),
+		  .switch(game_switch),
+	     .is_body(is_body),
+	     .is_food(is_food),
+	     .is_head(is_head),
+	     .data(data)
+    );
+
+	 
 	 // Generate checkerboard pattern
 //    checkerboard_pattern visual_data_inst (
 //        .clock(vga_clk),
@@ -120,14 +132,6 @@ module snake_game(
 //        .data(data)
 //    );
 	 
-	 snake_display visual_data_inst (
-	     .clock(vga_clk),
-		  .switch(game_switch),
-	     .is_body(is_body),
-	     .is_food(is_food),
-	     .is_head(is_head),
-	     .data(data)
-    );
 
 endmodule
 ////////////////////////////////////////////////////////////////////////////////

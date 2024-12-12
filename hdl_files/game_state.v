@@ -2,6 +2,7 @@
 // Module Name : Game State
 // Dependencies:
 // Description : Determining the state of the game
+//					  Creating pixel map based off game state
 //////////////////////////////////////////////////////////////////////////////
 `include "res_params.vh"
 `timescale 1ns / 1ps
@@ -21,7 +22,7 @@ module game_state (
 );
 
 // ----------------------------------------------------------------------------
-// Defining game state parameters
+// Defining game state local wires/parameters
 // ----------------------------------------------------------------------------
     localparam SCREEN_WIDTH       = `SCREEN_WIDTH;
     localparam SCREEN_HEIGHT      = `SCREEN_HEIGHT;
@@ -77,7 +78,7 @@ module game_state (
     end
 
 // ----------------------------------------------------------------------------
-// Update direction and game state on every clock cycle
+// Updating game state on clock tick
 // ----------------------------------------------------------------------------
     always @(posedge clk or posedge reset) begin
         if (reset) begin

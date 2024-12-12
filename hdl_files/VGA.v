@@ -7,8 +7,8 @@
 
 module VGA(
     input clock,             // 40MHz pixel clock
-    input [2:0] data,        // 3-bit data input (from visual_data module)
-    output [2:0] disp_RGB,   // 3-bit VGA display colors
+    input [2:0] data,        
+    output [2:0] disp_RGB,   // 3-bit RBG colours
     output hsync,            // VGA horizontal sync signal
     output vsync,            // VGA vertical sync signal
     output [9:0] hcount,     // Horizontal counter output

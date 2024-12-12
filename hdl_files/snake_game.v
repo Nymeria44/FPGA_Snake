@@ -86,15 +86,6 @@ module snake_game(
 // -----------------------------------------------------------------------------
 // VGA display
 // -----------------------------------------------------------------------------
-    // Generate checkerboard pattern
-    checkerboard_pattern visual_data_inst (
-        .clock(vga_clk),
-        .switch(game_switch),
-        .hcount(hcount),
-        .vcount(vcount),
-        .data(data)
-    );
-
     // Instantiate VGA
     VGA vga_inst (
         .clock(vga_clk),
@@ -104,7 +95,24 @@ module snake_game(
         .disp_RGB(disp_RGB),
         .hsync(hsync),
         .vsync(vsync)
-    ); 
+    );
+	 
+	 // Generate checkerboard pattern
+//    checkerboard_pattern visual_data_inst (
+//        .clock(vga_clk),
+//        .switch(game_switch),
+//        .hcount(hcount),
+//        .vcount(vcount),
+//        .data(data)
+//    );
+	 
+	 snake_display visual_data_inst (
+	     .clock(vga_clk),
+	     .is_body(is_body),
+	     .is_food(is_food),
+	     .is_head(is_head),
+	     .data(data)
+    );
 
 endmodule
 ////////////////////////////////////////////////////////////////////////////////

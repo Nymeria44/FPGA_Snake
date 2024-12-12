@@ -82,37 +82,32 @@ module game_state (
     // Update direction on every clock cycle
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            current_dir <= DIR_RIGHT; // Default direction
+            current_dir <= DIR_RIGHT;
+            score <= 12'd0;
+            snake_len <= SNAKE_LENGTH_BEGIN;
+            collision <= 1'b0;
+            food_x <= FOOD_BEGIN_X;
+            food_y <= FOOD_BEGIN_Y;
+
+            for (i_move = 0; i_move < SNAKE_LENGTH_BEGIN; i_move = i_move + 1) begin
+                snake_x[i_move] <= SNAKE_BEGIN_X - i_move * HEAD_WIDTH;
+                snake_y[i_move] <= SNAKE_BEGIN_Y;
+            end
         end else if (!stop) begin
+            // Update direction
             case (direction)
                 DIR_UP:    if (current_dir != DIR_DOWN)  current_dir <= DIR_UP;
                 DIR_DOWN:  if (current_dir != DIR_UP)    current_dir <= DIR_DOWN;
                 DIR_LEFT:  if (current_dir != DIR_RIGHT) current_dir <= DIR_LEFT;
                 DIR_RIGHT: if (current_dir != DIR_LEFT)  current_dir <= DIR_RIGHT;
             endcase
-        end
-    end
 
-    // Snake movement and game logic on every clock cycle
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            score <= 12'd0;
-            snake_len <= SNAKE_LENGTH_BEGIN;
-            for (i_move = 0; i_move < SNAKE_LENGTH_BEGIN; i_move = i_move + 1) begin
-                snake_x[i_move] <= SNAKE_BEGIN_X - i_move*HEAD_WIDTH;
-                snake_y[i_move] <= SNAKE_BEGIN_Y;
-            end
-            food_x <= FOOD_BEGIN_X;
-            food_y <= FOOD_BEGIN_Y;
-            collision <= 1'b0;
-        end else if (!stop) begin
             // Move body
             for (i_move = 1; i_move < SNAKE_LENGTH_MAX; i_move = i_move + 1) begin
                 if (i_move < snake_len) begin
                     snake_x[i_move] <= snake_x[i_move-1];
                     snake_y[i_move] <= snake_y[i_move-1];
                 end else begin
-                    // Hold current position or set to default
                     snake_x[i_move] <= snake_x[i_move];
                     snake_y[i_move] <= snake_y[i_move];
                 end
@@ -126,15 +121,20 @@ module game_state (
                 DIR_RIGHT: snake_x[0] <= snake_x[0] + HEAD_WIDTH;
             endcase
 
+            // Reset collision status
+            collision <= 1'b0;
+
             // Check for wall collision
-            if (snake_x[0] < 0 || snake_x[0] >= SCREEN_WIDTH || snake_y[0] < 0 || snake_y[0] >= SCREEN_HEIGHT) begin
+            if (snake_x[0] < 0 || snake_x[0] >= SCREEN_WIDTH ||
+                snake_y[0] < 0 || snake_y[0] >= SCREEN_HEIGHT) begin
                 collision <= 1'b1;
             end
 
             // Check for self-collision
-            collision <= collision;    // Reset collision status before checking
             for (i_collision = 1; i_collision < SNAKE_LENGTH_MAX; i_collision = i_collision + 1) begin
-                if (i_collision < snake_len && snake_x[0] == snake_x[i_collision] && snake_y[0] == snake_y[i_collision]) begin
+                if (i_collision < snake_len &&
+                    snake_x[0] == snake_x[i_collision] &&
+                    snake_y[0] == snake_y[i_collision]) begin
                     collision <= 1'b1;
                 end
             end
@@ -147,27 +147,25 @@ module game_state (
                     snake_y[snake_len] <= snake_y[snake_len-1];
                     snake_len <= snake_len + 1;
                 end
-
-                // Place new food
                 food_x <= (food_x + 100) % (SCREEN_WIDTH - FOOD_WIDTH);
                 food_y <= (food_y + 50) % (SCREEN_HEIGHT - FOOD_WIDTH);
             end
 
             // If collision, reset game
             if (collision) begin
-                score <= 0;
+                score <= 12'd0;
                 snake_len <= SNAKE_LENGTH_BEGIN;
-                for (i_move = 0; i_move < SNAKE_LENGTH_BEGIN; i_move = i_move + 1) begin
-                    snake_x[i_move] <= SNAKE_BEGIN_X - i_move*HEAD_WIDTH;
-                    snake_y[i_move] <= SNAKE_BEGIN_Y;
-                end
+                current_dir <= DIR_RIGHT;
                 food_x <= FOOD_BEGIN_X;
                 food_y <= FOOD_BEGIN_Y;
-                collision <= 1'b0;
+
+                for (i_move = 0; i_move < SNAKE_LENGTH_BEGIN; i_move = i_move + 1) begin
+                    snake_x[i_move] <= SNAKE_BEGIN_X - i_move * HEAD_WIDTH;
+                    snake_y[i_move] <= SNAKE_BEGIN_Y;
+                end
             end
         end
     end
-
 // ----------------------------------------------------------------------------
 // Creating pixel maps from game state
 // ----------------------------------------------------------------------------

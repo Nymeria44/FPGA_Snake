@@ -44,14 +44,6 @@ module snake_game(
 		  .locked(pll_locked) // PLL locked signal
 	 );
 
-    // Clock dividers for game logic
-    clock_divider slow_clock_divider(
-        .clk_in(clk),                      // INPUT 50MHz FPGA clock
-        .reset(rst_n),                     // INPUT reset button   
-        .ratio(32'd10_000),                // INPUT dividing ratio
-        .clk_out(slow_clk)                 // OUTPUT 5KHz clock
-    );
-
     clock_divider very_slow_clock_divider(
         .clk_in(clk),                      // INPUT 50MHz FPGA clock
         .reset(rst_n),                     // INPUT reset button
@@ -108,6 +100,7 @@ module snake_game(
 	 
 	 snake_display visual_data_inst (
 	     .clock(vga_clk),
+		  .switch(game_switch),
 	     .is_body(is_body),
 	     .is_food(is_food),
 	     .is_head(is_head),

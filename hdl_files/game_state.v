@@ -1,13 +1,13 @@
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 // Module Name : Game State
 // Dependencies:
-// Description : Determining the statee of the game
-////////////////////////////////////////////////////////////////////////////////
+// Description : Determining the state of the game
+//////////////////////////////////////////////////////////////////////////////
 `include "res_params.vh"
 `timescale 1ns / 1ps
 
-module game_logic (
-    input wire clk,
+module game_state (
+    input wire clk,              // Game clock
     input wire [1:0] direction,  // 00-up, 01-right, 10-down, 11-left
     input wire stop,
     input wire reset,
@@ -22,10 +22,10 @@ module game_logic (
     output reg [11:0] score
 );
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Defining game state parameters
-// -----------------------------------------------------------------------------
-	 // Defining screen resolution parameters locally (from res_params.vh)
+// ----------------------------------------------------------------------------
+    // Defining screen resolution parameters locally (from res_params.vh)
     localparam SCREEN_WIDTH = `SCREEN_WIDTH;
     localparam SCREEN_HEIGHT = `SCREEN_HEIGHT;
     localparam FOOD_WIDTH = `FOOD_WIDTH;
@@ -53,17 +53,16 @@ module game_logic (
     reg [15:0] food_x;
     reg [15:0] food_y;
 
-    // Simple game tick divider for movement (adjust for game speed)
-    reg [31:0] tick_count;
-    localparam TICK_MAX = 2000000; // Adjust game speed as needed
-
-    wire game_tick = (tick_count == TICK_MAX);
-	 
-// -----------------------------------------------------------------------------
-// VGA logic
-// -----------------------------------------------------------------------------
-    // Initialize
+// ----------------------------------------------------------------------------
+// Declare loop variables at module level
+// ----------------------------------------------------------------------------
     integer i;
+    integer i_move;
+    integer i_collision;
+
+// ----------------------------------------------------------------------------
+// Initialize game
+// ----------------------------------------------------------------------------
     initial begin
         score = 12'd0;
         snake_len = SNAKE_LENGTH_BEGIN;
@@ -75,51 +74,50 @@ module game_logic (
         collision = 1'b0;
         food_x = FOOD_BEGIN_X;
         food_y = FOOD_BEGIN_Y;
-        tick_count = 32'd0;
     end
 
-    // Game tick generation
+// ----------------------------------------------------------------------------
+// Update Game State
+// ----------------------------------------------------------------------------
+    // Update direction on every clock cycle
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            tick_count <= 32'd0;
-        end else begin
-            if (!stop) begin
-                if (tick_count < TICK_MAX) begin
-                    tick_count <= tick_count + 32'd1;
-                end else begin
-                    tick_count <= 32'd0;
-                end
-            end
+            current_dir <= DIR_RIGHT; // Default direction
+        end else if (!stop) begin
+            case (direction)
+                DIR_UP:    if (current_dir != DIR_DOWN)  current_dir <= DIR_UP;
+                DIR_DOWN:  if (current_dir != DIR_UP)    current_dir <= DIR_DOWN;
+                DIR_LEFT:  if (current_dir != DIR_RIGHT) current_dir <= DIR_LEFT;
+                DIR_RIGHT: if (current_dir != DIR_LEFT)  current_dir <= DIR_RIGHT;
+            endcase
         end
     end
 
-    // Update direction if game tick occurs
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            current_dir <= DIR_RIGHT;
-        end else if (game_tick && !stop) begin
-            current_dir <= direction;
-        end
-    end
-
-    // Snake movement and logic
+    // Snake movement and game logic on every clock cycle
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             score <= 12'd0;
             snake_len <= SNAKE_LENGTH_BEGIN;
-            for (i = 0; i < SNAKE_LENGTH_BEGIN; i = i + 1) begin
-                snake_x[i] <= SNAKE_BEGIN_X - i*HEAD_WIDTH;
-                snake_y[i] <= SNAKE_BEGIN_Y;
+            for (i_move = 0; i_move < SNAKE_LENGTH_BEGIN; i_move = i_move + 1) begin
+                snake_x[i_move] <= SNAKE_BEGIN_X - i_move*HEAD_WIDTH;
+                snake_y[i_move] <= SNAKE_BEGIN_Y;
             end
             food_x <= FOOD_BEGIN_X;
             food_y <= FOOD_BEGIN_Y;
             collision <= 1'b0;
-        end else if (game_tick && !stop) begin
+        end else if (!stop) begin
             // Move body
-            for (i = snake_len-1; i > 0; i = i - 1) begin
-                snake_x[i] <= snake_x[i-1];
-                snake_y[i] <= snake_y[i-1];
+            for (i_move = 1; i_move < SNAKE_LENGTH_MAX; i_move = i_move + 1) begin
+                if (i_move < snake_len) begin
+                    snake_x[i_move] <= snake_x[i_move-1];
+                    snake_y[i_move] <= snake_y[i_move-1];
+                end else begin
+                    // Hold current position or set to default
+                    snake_x[i_move] <= snake_x[i_move];
+                    snake_y[i_move] <= snake_y[i_move];
+                end
             end
+
             // Move head
             case (current_dir)
                 DIR_UP:    snake_y[0] <= snake_y[0] - HEAD_WIDTH;
@@ -134,8 +132,10 @@ module game_logic (
             end
 
             // Check for self-collision
-            for (i = 1; i < snake_len; i = i + 1) begin
-                if (snake_x[0] == snake_x[i] && snake_y[0] == snake_y[i]) begin
+            // Reset collision status before checking
+            collision <= collision;
+            for (i_collision = 1; i_collision < SNAKE_LENGTH_MAX; i_collision = i_collision + 1) begin
+                if (i_collision < snake_len && snake_x[0] == snake_x[i_collision] && snake_y[0] == snake_y[i_collision]) begin
                     collision <= 1'b1;
                 end
             end
@@ -144,10 +144,11 @@ module game_logic (
             if (snake_x[0] == food_x && snake_y[0] == food_y) begin
                 score <= score + 1;
                 if (snake_len < SNAKE_LENGTH_MAX) begin
+                    snake_x[snake_len] <= snake_x[snake_len-1];
+                    snake_y[snake_len] <= snake_y[snake_len-1];
                     snake_len <= snake_len + 1;
-                    snake_x[snake_len-1] <= snake_x[snake_len-2];
-                    snake_y[snake_len-1] <= snake_y[snake_len-2];
                 end
+
                 // Place new food (simple pattern for now)
                 food_x <= (food_x + 100) % (SCREEN_WIDTH - FOOD_WIDTH);
                 food_y <= (food_y + 50) % (SCREEN_HEIGHT - FOOD_WIDTH);
@@ -157,9 +158,9 @@ module game_logic (
             if (collision) begin
                 score <= 0;
                 snake_len <= SNAKE_LENGTH_BEGIN;
-                for (i = 0; i < SNAKE_LENGTH_BEGIN; i = i + 1) begin
-                    snake_x[i] <= SNAKE_BEGIN_X - i*HEAD_WIDTH;
-                    snake_y[i] <= SNAKE_BEGIN_Y;
+                for (i_move = 0; i_move < SNAKE_LENGTH_BEGIN; i_move = i_move + 1) begin
+                    snake_x[i_move] <= SNAKE_BEGIN_X - i_move*HEAD_WIDTH;
+                    snake_y[i_move] <= SNAKE_BEGIN_Y;
                 end
                 food_x <= FOOD_BEGIN_X;
                 food_y <= FOOD_BEGIN_Y;
@@ -168,8 +169,9 @@ module game_logic (
         end
     end
 
-    // Pixel-level detection
-    // Check if the current pixel corresponds to snake's body, head or food
+// ----------------------------------------------------------------------------
+// Creating pixel maps from game state
+// ----------------------------------------------------------------------------
     always @(*) begin
         is_body = 1'b0;
         is_head = 1'b0;
@@ -180,8 +182,8 @@ module game_logic (
                 is_head = 1'b1;
             end else begin
                 // Check body
-                for (i = 1; i < snake_len; i = i + 1) begin
-                    if (col == snake_x[i] && row == snake_y[i]) begin
+                for (i_collision = 1; i_collision < SNAKE_LENGTH_MAX; i_collision = i_collision + 1) begin
+                    if (i_collision < snake_len && col == snake_x[i_collision] && row == snake_y[i_collision]) begin
                         is_body = 1'b1;
                     end
                 end
@@ -194,4 +196,4 @@ module game_logic (
     end
 
 endmodule
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////

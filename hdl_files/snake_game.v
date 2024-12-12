@@ -6,8 +6,6 @@
 `timescale 1ns / 1ps
 
 module snake_game(
-    input ps2_clk,                 // PS2 clock pin 10-16.7Khz
-    input ps2_data,                // PS2 data pin 
     input clk,                     // 50MHz FPGA clock
     input rst_n,                   // reset button
     output wire [2:0] disp_RGB,    // 3-bit VGA display colors
@@ -23,11 +21,11 @@ module snake_game(
     wire [7:0] ps2_byte;           // 1byte hex key value
     wire slow_clk;                 // general clock
     wire game_clk;                 // game clock
-    wire [1:0] game_switch;        // Switch to control display mode
+    wire pll_locked;
     wire [9:0] hcount;
     wire [9:0] vcount;
     wire [2:0] data;
-    // wire vga_clk;					  // Commented out while clock is exposed for TB
+	 wire [1:0] game_switch;        // Switch to control display mode
 
     assign game_switch = 2'b10;    // Always show horizontal data
 
@@ -59,20 +57,32 @@ module snake_game(
     // -----------------------------------------------------------------------------
     // Player input
     // -----------------------------------------------------------------------------
-    // PS2 keyboard input
-    ps2scan ps2scan(
-        .clk(clk),                         // INPUT 50MHz FPGA clock
-        .rst_n(rst_n),                     // INPUT reset button
-        .ps2k_clk(ps2_clk),                // INPUT PS2 clk pin 10-16.7KHz
-        .ps2k_data(ps2_data),              // INPUT PS2 data pin     
-        .ps2_byte(ps2_byte),               // OUTPUT 1-byte hex key value
-        .ps2_state(ps2_state)              // OUTPUT keypress #unused
-    );
+
 
     // -----------------------------------------------------------------------------
     // Game logic and display processing
     // -----------------------------------------------------------------------------
+    wire is_body;
+    wire is_food;
+    wire is_head;
+    wire [11:0] score;
 
+    // Hard-code direction to right, no stop, use inverted reset
+    // Always enable pixel queries for now
+    game_state game_state_inst (
+        .clk(game_clk),
+        .direction(2'b01), // Always move right
+        .stop(1'b0),
+        .reset(!rst_n),
+        .en(1'b1),
+        .row({6'b0, vcount}),
+        .col({6'b0, hcount}),
+        .is_body(is_body),
+        .is_food(is_food),
+        .is_head(is_head),
+        .score(score)
+    );
+	 
     // -----------------------------------------------------------------------------
     // VGA display
     // -----------------------------------------------------------------------------

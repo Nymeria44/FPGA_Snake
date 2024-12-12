@@ -11,7 +11,6 @@ module game_state (
     input wire [1:0] direction,  // 00-up, 01-right, 10-down, 11-left
     input wire stop,
     input wire reset,
-
     input wire [15:0] row,       // current pixel row
     input wire [15:0] col,       // current pixel column
 
@@ -52,7 +51,10 @@ module game_state (
     integer i_move;
     integer i_collision;
 
-    // Task to initialize/reset the game state
+// ----------------------------------------------------------------------------
+// Initialise game
+// ----------------------------------------------------------------------------
+    // Initialise/reset the game state task
     task init_game;
         integer idx;
         begin
@@ -69,14 +71,8 @@ module game_state (
             end
         end
     endtask
-
-// ----------------------------------------------------------------------------
-// Initialize game at the start
-// ----------------------------------------------------------------------------
-    initial begin
-        // Even though init_game uses non-blocking assignments, calling it here is fine.
-        // The initial block runs before simulation starts, so all registers will end up 
-        // with the correct initial values.
+	 
+	 initial begin
         init_game;
     end
 
@@ -85,7 +81,7 @@ module game_state (
 // ----------------------------------------------------------------------------
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            init_game; // On reset, re-initialize the game
+            init_game;
         end else if (!stop) begin
             // Update direction
             case (direction)

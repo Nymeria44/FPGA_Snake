@@ -13,7 +13,9 @@ module VGA(
     output [9:0] vcount      // Vertical counter output
 );
 
-    // VGA timing parameters for 800x600 @ 60Hz
+// -----------------------------------------------------------------------------
+// Assigning VGA internal parameters
+// -----------------------------------------------------------------------------
     parameter h_active = 800;
     parameter h_fp = 40;
     parameter h_sync = 128;
@@ -36,6 +38,9 @@ module VGA(
     reg [10:0] hcount_reg = 0;  // 11-bit counter for horizontal pixels
     reg [10:0] vcount_reg = 0;  // 11-bit counter for vertical lines
 
+// -----------------------------------------------------------------------------
+// VGA internal logic
+// -----------------------------------------------------------------------------
     // Horizontal counter
     always @(posedge clock) begin
         if (hcount_reg == h_total - 1)

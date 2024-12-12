@@ -14,13 +14,12 @@ module snake_game(
 	 output wire vga_clk            // Exposing VGA clock for testbenching
 );
 
-    // Internal signals
-    wire [188:0] x_list;           // 3bit x coordinates, 63 snake segments
-    wire [188:0] y_list;           // 3bit y coordinate, 63 snake segments
-    wire [5:0] length;             // length of the snake
-    wire [7:0] ps2_byte;           // 1byte hex key value
+// -----------------------------------------------------------------------------
+// Assigning internal wires
+// -----------------------------------------------------------------------------
+    // Clock / VGA internal signals
     wire slow_clk;                 // general clock
-    wire game_clk;                 // game clock
+    wire game_clk;                 // game clock (5Mhz)
     wire pll_locked;
     wire [9:0] hcount;
     wire [9:0] vcount;
@@ -28,10 +27,16 @@ module snake_game(
 	 wire [1:0] game_switch;        // Switch to control display mode
 
     assign game_switch = 2'b10;    // Always show horizontal data
+	 
+	 // Game State internal signals
+	 wire is_body;
+    wire is_food;
+    wire is_head;
+    wire [11:0] score;
 
-	 // -----------------------------------------------------------------------------
-	 // Clock signals for the game
-	 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Clock signals
+// -----------------------------------------------------------------------------
 	 // Generate 40MHz VGA clock using PLL
 	 PLL_IP pll_inst (
 		  .inclk0(clk),      // 50 MHz input clock
@@ -62,11 +67,6 @@ module snake_game(
 // -----------------------------------------------------------------------------
 // Game logic and display processing
 // -----------------------------------------------------------------------------
-    wire is_body;
-    wire is_food;
-    wire is_head;
-    wire [11:0] score;
-
     // Hard-code direction to right, no stop, use inverted reset
     // Always enable pixel queries for now
     game_state game_state_inst (

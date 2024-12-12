@@ -61,7 +61,7 @@ module game_state (
     integer i_collision;
 
 // ----------------------------------------------------------------------------
-// Initialize game
+// Initialise game
 // ----------------------------------------------------------------------------
     initial begin
         score = 12'd0;
@@ -77,7 +77,7 @@ module game_state (
     end
 
 // ----------------------------------------------------------------------------
-// Update Game State
+// Update game state
 // ----------------------------------------------------------------------------
     // Update direction on every clock cycle
     always @(posedge clk or posedge reset) begin

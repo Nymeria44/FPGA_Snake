@@ -3,6 +3,8 @@
 // Dependencies:
 // Description : Responsible for drawing to monitor using VGA    
 ////////////////////////////////////////////////////////////////////////////////
+`include "res_params.vh"
+
 module VGA(
     input clock,             // 40MHz pixel clock
     input [2:0] data,        // 3-bit data input (from visual_data module)
@@ -16,24 +18,25 @@ module VGA(
 // -----------------------------------------------------------------------------
 // Assigning VGA internal parameters
 // -----------------------------------------------------------------------------
-    parameter h_active = 800;
-    parameter h_fp = 40;
-    parameter h_sync = 128;
-    parameter h_bp = 88;
-    parameter h_total = h_active + h_fp + h_sync + h_bp;  // 1056
+    // Screen dimensions
+    localparam h_active = `H_ACTIVE;      // Active horizontal pixels
+    localparam h_fp     = `H_FP;          // Horizontal front porch
+    localparam h_sync   = `H_SYNC;        // Horizontal sync pulse width
+    localparam h_bp     = `H_BP;          // Horizontal back porch
+    localparam h_total  = `H_TOTAL;       // Total horizontal pixels
 
-    parameter v_active = 600;
-    parameter v_fp = 1;
-    parameter v_sync = 4;
-    parameter v_bp = 23;
-    parameter v_total = v_active + v_fp + v_sync + v_bp;  // 628
+    localparam v_active = `V_ACTIVE;      // Active vertical lines
+    localparam v_fp     = `V_FP;          // Vertical front porch
+    localparam v_sync   = `V_SYNC;        // Vertical sync pulse width
+    localparam v_bp     = `V_BP;          // Vertical back porch
+    localparam v_total  = `V_TOTAL;       // Total vertical lines
 
     // Timing positions
-    parameter hsync_start = h_active + h_fp;
-    parameter hsync_end = h_active + h_fp + h_sync;
+    localparam hsync_start = h_active + h_fp;
+    localparam hsync_end   = h_active + h_fp + h_sync;
 
-    parameter vsync_start = v_active + v_fp;
-    parameter vsync_end = v_active + v_fp + v_sync;
+    localparam vsync_start = v_active + v_fp;
+    localparam vsync_end   = v_active + v_fp + v_sync;
 
     reg [10:0] hcount_reg = 0;  // 11-bit counter for horizontal pixels
     reg [10:0] vcount_reg = 0;  // 11-bit counter for vertical lines

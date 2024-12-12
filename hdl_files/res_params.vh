@@ -3,7 +3,6 @@
 // Dependencies:
 // Description : Parameters which define the resolution of the game
 ////////////////////////////////////////////////////////////////////////////////
-// res_params.vh: Resolution Parameters
 // Screen dimensions
 `define SCREEN_WIDTH 800
 `define SCREEN_HEIGHT 600
@@ -27,7 +26,7 @@
 `define SNAKE_BEGIN_X (`SCREEN_WIDTH / 3)
 `define SNAKE_BEGIN_Y (`SCREEN_HEIGHT / 2)
 `define SNAKE_LENGTH_BEGIN 4
-`define SNAKE_LENGTH_MAX 50
+`define SNAKE_LENGTH_MAX 40
 `define FOOD_BEGIN_X (`SCREEN_WIDTH * 3 / 4)
 `define FOOD_BEGIN_Y (`SCREEN_HEIGHT * 2 / 3)
 ////////////////////////////////////////////////////////////////////////////////

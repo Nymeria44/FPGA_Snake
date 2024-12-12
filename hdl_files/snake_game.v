@@ -37,36 +37,37 @@ module snake_game(
 // -----------------------------------------------------------------------------
 // Clock signals
 // -----------------------------------------------------------------------------
-	 // Generate 40MHz VGA clock using PLL
+	 // 40MHz VGA clock using PLL
 	 PLL_IP pll_inst (
-		  .inclk0(clk),      // 50 MHz input clock
-		  .c0(vga_clk),      // 40 MHz output clock
-		  .locked(pll_locked) // PLL locked signal
+		  .inclk0(clk),
+		  .c0(vga_clk),
+		  .locked(pll_locked)
 	 );
 
+	 // 5MHZ clock
     clock_divider very_slow_clock_divider(
-        .clk_in(clk),                      // INPUT 50MHz FPGA clock
-        .reset(rst_n),                     // INPUT reset button
-        .ratio(32'd10_000_000),            // INPUT dividing ratio
-        .clk_out(game_clk)                 // OUTPUT 5Hz clock
+        .clk_in(clk),
+        .reset(rst_n),
+        .ratio(32'd10_000_000),            // dividing ratio
+        .clk_out(game_clk)
     );
 
 // -----------------------------------------------------------------------------
 // Player input
 // -----------------------------------------------------------------------------
 
+// Play input missing
 
 // -----------------------------------------------------------------------------
 // Game logic and display processing
 // -----------------------------------------------------------------------------
-    // Hard-code direction to right, no stop, use inverted reset
-    // Always enable pixel queries for now
+    // Hard-code direction to right as play input missing
+	 // Commented out as it puts project over element limit
     game_state game_state_inst (
         .clk(game_clk),
-        .direction(2'b01), // Always move right
+        .direction(2'b01),
         .stop(1'b0),
         .reset(!rst_n),
-        .en(1'b1),
         .row({6'b0, vcount}),
         .col({6'b0, hcount}),
         .is_body(is_body),
@@ -78,7 +79,7 @@ module snake_game(
 // -----------------------------------------------------------------------------
 // VGA display
 // -----------------------------------------------------------------------------
-    // Instantiate VGA
+    // Initalise VGA
     VGA vga_inst (
         .clock(vga_clk),
         .data(data),

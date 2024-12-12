@@ -12,7 +12,6 @@ module game_state (
     input wire stop,
     input wire reset,
 
-    input wire en,                // enable signal for pixel queries
     input wire [15:0] row,        // current pixel row
     input wire [15:0] col,        // current pixel column
 
@@ -22,10 +21,11 @@ module game_state (
     output reg [11:0] score
 );
 
+
 // ----------------------------------------------------------------------------
 // Defining game state parameters
 // ----------------------------------------------------------------------------
-    // Defining screen resolution parameters locally (from res_params.vh)
+    // Defining screen resolution parameters locally
     localparam SCREEN_WIDTH = `SCREEN_WIDTH;
     localparam SCREEN_HEIGHT = `SCREEN_HEIGHT;
     localparam FOOD_WIDTH = `FOOD_WIDTH;
@@ -54,7 +54,7 @@ module game_state (
     reg [15:0] food_y;
 
 // ----------------------------------------------------------------------------
-// Declare loop variables at module level
+//  Loop variables (module level to avoid issue)
 // ----------------------------------------------------------------------------
     integer i;
     integer i_move;
@@ -132,8 +132,7 @@ module game_state (
             end
 
             // Check for self-collision
-            // Reset collision status before checking
-            collision <= collision;
+            collision <= collision;    // Reset collision status before checking
             for (i_collision = 1; i_collision < SNAKE_LENGTH_MAX; i_collision = i_collision + 1) begin
                 if (i_collision < snake_len && snake_x[0] == snake_x[i_collision] && snake_y[0] == snake_y[i_collision]) begin
                     collision <= 1'b1;
@@ -149,7 +148,7 @@ module game_state (
                     snake_len <= snake_len + 1;
                 end
 
-                // Place new food (simple pattern for now)
+                // Place new food
                 food_x <= (food_x + 100) % (SCREEN_WIDTH - FOOD_WIDTH);
                 food_y <= (food_y + 50) % (SCREEN_HEIGHT - FOOD_WIDTH);
             end
@@ -177,30 +176,27 @@ module game_state (
 		 is_head = 1'b0;
 		 is_food = 1'b0;
 
-		 if (en) begin
-			  // Check head block
-			  if ((col >= snake_x[0]) && (col < snake_x[0] + HEAD_WIDTH) &&
-					(row >= snake_y[0]) && (row < snake_y[0] + HEAD_WIDTH)) begin
-					is_head = 1'b1;
-			  end else begin
-					// Check each body segment as a block
-					for (i_collision = 1; i_collision < SNAKE_LENGTH_MAX; i_collision = i_collision + 1) begin
-						 if (i_collision < snake_len &&
-							  (col >= snake_x[i_collision]) && (col < snake_x[i_collision] + HEAD_WIDTH) &&
-							  (row >= snake_y[i_collision]) && (row < snake_y[i_collision] + HEAD_WIDTH)) begin
-							  is_body = 1'b1;
-						 end
-					end
-			  end
+		  // Check head block
+		  if ((col >= snake_x[0]) && (col < snake_x[0] + HEAD_WIDTH) &&
+				(row >= snake_y[0]) && (row < snake_y[0] + HEAD_WIDTH)) begin
+				is_head = 1'b1;
+		  end else begin
+				// Check each body segment as a block
+				for (i_collision = 1; i_collision < SNAKE_LENGTH_MAX; i_collision = i_collision + 1) begin
+					 if (i_collision < snake_len &&
+						  (col >= snake_x[i_collision]) && (col < snake_x[i_collision] + HEAD_WIDTH) &&
+						  (row >= snake_y[i_collision]) && (row < snake_y[i_collision] + HEAD_WIDTH)) begin
+						  is_body = 1'b1;
+					 end
+				end
+		  end
 
-			  // Check food block
-			  if ((col >= food_x) && (col < food_x + FOOD_WIDTH) &&
-					(row >= food_y) && (row < food_y + FOOD_WIDTH)) begin
-					is_food = 1'b1;
-			  end
-		 end
+		  // Check food block
+		  if ((col >= food_x) && (col < food_x + FOOD_WIDTH) &&
+				(row >= food_y) && (row < food_y + FOOD_WIDTH)) begin
+				is_food = 1'b1;
+		  end
 	end
-
 
 endmodule
 //////////////////////////////////////////////////////////////////////////////

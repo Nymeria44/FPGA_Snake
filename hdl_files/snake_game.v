@@ -8,14 +8,14 @@
 module snake_game(
     input clk,                     // 50MHz FPGA clock
     input rst_n,                   // reset button
-	 input S1,                      // Left button
+    input S1,                      // Left button
     input S2,                      // Up button
     input S3,                      // Down button
     input S4,                      // Right button
     output wire [2:0] disp_RGB,    // 3-bit VGA display colors
     output wire hsync,             // VGA horizontal sync signal
     output wire vsync,              // VGA vertical sync signal
-	 output wire vga_clk            // Exposing VGA clock for testbenching
+    output wire vga_clk            // Exposing VGA clock for testbenching
 );
 
 // -----------------------------------------------------------------------------
@@ -27,23 +27,23 @@ module snake_game(
     wire [9:0] hcount;
     wire [9:0] vcount;
     wire [2:0] data;
-	 wire [1:0] game_switch;        // Switch to control display mode
+    wire [1:0] game_switch;        // Switch to control display mode
 
     assign game_switch = 2'b10;    // Always show horizontal data
-	 
-	 // Game State internal signals
-	 wire is_body;
+
+    // Game State internal signals
+    wire is_body;
     wire is_food;
     wire is_head;
     wire [11:0] score;
-	 
-	 // Direction constants (for movement)
+
+    // Direction constants (for movement)
     localparam DIR_UP    = 2'b00;
     localparam DIR_RIGHT = 2'b01;
     localparam DIR_DOWN  = 2'b10;
     localparam DIR_LEFT  = 2'b11;
-    
-	 reg [1:0] current_direction;
+
+    reg [1:0] current_direction;
 
 // -----------------------------------------------------------------------------
 // Clock signals
@@ -67,8 +67,8 @@ module snake_game(
 // Player input
 // -----------------------------------------------------------------------------
     // Setting current direction based off FPGA keys
-	 // Note: conditions for legal movement handled within game_state
-	 // Note: controls use vim style (h,j,l,k keybinds) for movement
+    // Note: conditions for legal movement handled within game_state
+    // Note: controls use vim style (h,j,l,k keybinds) for movement
 	 always @(*) begin
         if (!S1) begin
             current_direction = DIR_LEFT;
@@ -124,13 +124,13 @@ module snake_game(
 
 	 
 	 // Generate checkerboard pattern
-//    checkerboard_pattern visual_data_inst (
-//        .clock(vga_clk),
-//        .switch(game_switch),
-//        .hcount(hcount),
-//        .vcount(vcount),
-//        .data(data)
-//    );
+    checkerboard_pattern visual_data_inst (
+        .clock(vga_clk),
+        .switch(game_switch),
+        .hcount(hcount),
+        .vcount(vcount),
+        .data(data)
+    );
 	 
 
 endmodule

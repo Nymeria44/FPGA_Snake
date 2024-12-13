@@ -62,7 +62,7 @@ module VGA(
         end
     end
 
-    // Synchronization signals
+    // Synchronisation signals
     assign hsync = ~((hcount_reg >= hsync_start) && (hcount_reg < hsync_end));
     assign vsync = ~((vcount_reg >= vsync_start) && (vcount_reg < vsync_end));
 
